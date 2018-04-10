@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='Nimiq' Id='FD255B7F-61D2-4702-AA5C-7A099FE088DA' UpgradeCode='32D90F1D-21A5-4D70-A46F-8E737328AD33'
+    Language='1033' Codepage='1252' Version='1.1.0' Manufacturer='Nimiq Foundation'>
+
+    <Package Id='*' Keywords='Installer' Description='Nimiq Installer' Comments='Nimiq Node.js Installer'
+      Manufacturer='Nimiq Foundation' InstallerVersion='405' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+
+    <Media Id='1' Cabinet='Main.cab' EmbedCab='yes' />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFiles64Folder' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='Nimiq'>
+
+          <Component Id='MainExecutable' Guid='EEF5911C-38D3-4087-8388-9BE118B8BDC7' Win64='yes'>
+            <File Id='NimiqCMD' Name='Nimiq.cmd' DiskId='1' Source='nimiq.cmd' KeyPath='yes'>
+              <Shortcut Id="startmenuNimiq09" Directory="ProgramMenuDir" Name="Nimiq" WorkingDirectory='NimiqDataFolder' Icon="Nimiq.ico" IconIndex="0" Advertise="yes" />
+              <Shortcut Id="desktopNimiq09" Directory="DesktopFolder" Name="Nimiq" WorkingDirectory='NimiqDataFolder' Icon="Nimiq.ico" IconIndex="0" Advertise="yes" />
+            </File>
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <Directory Id="LocalAppDataFolder">
+        <Directory Id="NimiqDataFolder" Name="Nimiq">
+          <Component Id="NimiqDataFolder" Guid="2F68D58D-3A06-4A7C-9AF6-F43459902926" Win64='yes'>
+            <File Id='NimiqConf' Name='nimiq-conf.txt' Source='nimiq-conf.txt'>
+              <Shortcut Id="startmenuNimiqConf" Directory="ProgramMenuDir" Name="Edit config" WorkingDirectory='NimiqDataFolder' />
+            </File>
+            <RemoveFolder Id='NimiqDataFolder' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]\NimiqDataFolder' Type='string' Value='' KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="Nimiq">
+
+          <Component Id="ProgramMenuDir" Guid="FCFA155E-DFD6-4965-AA85-BA10AF77F3A1" Win64='yes'>
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]\ProgramMenuDir' Type='string' Value='' KeyPath='yes' />
+          </Component>
+
+        </Directory>
+      </Directory>
+
+      <Directory Id="DesktopFolder" Name="Desktop" />
+    </Directory>
+
+    <Feature Id='Complete' Title='Nimiq' Description='The complete package.' Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
+      <Feature Id='MainProgram' Title='Program' Description='The main executable.' Level='1'>
+        <ComponentGroupRef Id='MainComponentGroup' />
+        <ComponentRef Id='MainExecutable' />
+        <ComponentRef Id='ProgramMenuDir' />
+        <ComponentRef Id='NimiqDataFolder' />
+      </Feature>
+    </Feature>
+
+    <UIRef Id="WixUI_Minimal" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Property Id="ARPPRODUCTICON" Value="Nimiq.ico" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <Icon Id="Nimiq.ico" SourceFile="nimiq-logo.ico" />
+
+  </Product>
+</Wix>
