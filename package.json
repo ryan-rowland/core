@@ -1,7 +1,6 @@
 {
-  "name": "@nimiq/core",
-  "version": "1.1.0",
-  "main": "dist/node.js",
+  "name": "nimiq",
+  "version": "1.1.0-1",
   "homepage": "https://nimiq.com/",
   "description": "",
   "scripts": {
