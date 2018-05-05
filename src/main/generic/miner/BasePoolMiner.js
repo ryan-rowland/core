@@ -28,6 +28,7 @@ class BasePoolMiner extends Miner {
 
         /** @type {BasePoolMiner.ConnectionState} */
         this.connectionState = BasePoolMiner.ConnectionState.CLOSED;
+        this._connectTimeout = null;
 
         this._reconnectTimeout = null;
         this._exponentialBackoffReconnect = BasePoolMiner.RECONNECT_TIMEOUT;
@@ -59,10 +60,16 @@ class BasePoolMiner extends Miner {
         this._ws.onmessage = (msg) => this._onMessage(JSON.parse(msg.data));
         this._ws.onclose = (e) => this._onClose(ws, e);
 
+        this._connectTimeout = setTimeout(() => {
+          this._onClose(ws, e);
+        }, BasePoolMiner.CONNECT_TIMEOUT);
+
         this._changeConnectionState(BasePoolMiner.ConnectionState.CONNECTING);
     }
 
     _onOpen(ws) {
+        clearTimeout(this._connectTimeout);
+
         if (ws !== this._ws) {
             ws.close();
         } else {
@@ -77,6 +84,8 @@ class BasePoolMiner extends Miner {
     }
 
     _onError(ws, e) {
+        clearTimeout(this._connectTimeout);
+
         Log.d(BasePoolMiner, `WebSocket connection errored ${JSON.stringify(e)}`);
         if (ws === this._ws) {
             this._timeoutReconnect();
@@ -89,6 +98,8 @@ class BasePoolMiner extends Miner {
     }
 
     _onClose(ws, e) {
+        clearTimeout(this._connectTimeout);
+
         Log.d(BasePoolMiner, `WebSocket connection closed ${JSON.stringify(e)}`);
         this._changeConnectionState(BasePoolMiner.ConnectionState.CLOSED);
         Log.w(BasePoolMiner, 'Disconnected from pool');
@@ -242,6 +253,7 @@ class BasePoolMiner extends Miner {
         ].reduce(BufferUtils.concatTypedArrays)).serialize().readUint32();
     }
 }
+BasePoolMiner.CONNECT_TIMEOUT = 15000; // 15 seconds
 BasePoolMiner.PAYOUT_NONCE_PREFIX = 'POOL_PAYOUT';
 BasePoolMiner.RECONNECT_TIMEOUT = 3000; // 3 seconds
 BasePoolMiner.RECONNECT_TIMEOUT_MAX = 30000; // 30 seconds
